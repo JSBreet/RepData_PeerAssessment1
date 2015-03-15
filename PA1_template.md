@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 ## Introduction
 This report is part of the Coursera course "Reproducible Research". The data 
 that will be used for this assignment is collected via a personal activity monitoring
@@ -27,7 +22,8 @@ The dataset will be loaded into R and saved as a dataframe. The class of the dat
 In addition, three packages will be loaded that are used for data processing and
 plotting.
 
-```{r Loading & Preprocessing}
+
+```r
 # Loading the activity.csv file into R and saving it as a dataframe
 data <- read.csv("./activity.csv")
 
@@ -36,6 +32,22 @@ data$date <- as.Date(data$date)
 
 # Load the relevant packages
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(ggplot2)
 library(scales)
 ```
@@ -43,7 +55,8 @@ library(scales)
 ## 2. What is mean total number of steps taken per day?
 In this part of the assignment, the total number of steps per day will be calculated.
 A histogram of the total number of steps per day will be presented first.
-```{r Mean Total Number of Steps}
+
+```r
 # Group the data by date
 grdata <- group_by(data, date)
 
@@ -70,16 +83,32 @@ p1 <- p1 + ggtitle("Total Number of Steps Taken per Day")
 print(p1)
 ```
 
+```
+## Warning: Removed 8 rows containing missing values (position_stack).
+```
+
+![](PA1_template_files/figure-html/Mean Total Number of Steps-1.png) 
+
 In addition, the mean and median number of steps per day will be calculated.
-```{r mean steps per day}
+
+```r
 ## 3. Calculate and Report the Mean and Median
 # Calculate and report the mean total steps per day
 round(mean(totalsteps$Steps, na.rm = TRUE), digits = 2)
 ```
 
-```{r median steps per day}
+```
+## [1] 10766.19
+```
+
+
+```r
 # Calculate and report the median total steps per day
 median(totalsteps$Steps, na.rm = TRUE)
+```
+
+```
+## [1] 10765
 ```
 
 ## 3. What is the average daily activity pattern?
@@ -90,7 +119,8 @@ This means that a gap of 55 exists between each of the hours. Using this variabl
 directly as a scale in a plot will lead to incorrect results. It is for this reason
 that this variable will be transformed from the integer class to the POSIX class.
 
-```{r Compute the Average Daily Activity Pattern}
+
+```r
 # Group the data by interval
 grdataint <- group_by(data, interval)
 
@@ -134,13 +164,13 @@ for(n in 1:nrow(averagesteps)) {
 # suppressed. We are not interested in the date, but in the time intervals 
 # accross a number of days.
 averagesteps$Time <- strptime(intervaltime[,1], "%H%M")
-
 ```
 
 After the average number of steps per interval have been calculated and the intervals
 have the correct time-based format, a Time Series plot will be created.
 
-```{r Plot the Average Daily Activity Pattern}
+
+```r
 ## 1. Make a Time Series Plot of the Intervals (x-axis) and average steps (y-axis)
 # Change columnnames
 colnames(averagesteps) <- c("Interval", "Steps", "Time")
@@ -167,9 +197,12 @@ p2 <- p2 + scale_x_datetime(labels = date_format("%H%M"), breaks = date_breaks("
 print(p2)
 ```
 
+![](PA1_template_files/figure-html/Plot the Average Daily Activity Pattern-1.png) 
+
 The interval that conists of the maximum number of steps will be computed next.
 
-```{r}
+
+```r
 ## 2. Which 5-minute Interval, On Average, Contains the Maximum Number of Steps?
 
 # Drop the Time variable so that the dataframe properly works with dplyr
@@ -184,7 +217,7 @@ maxint <- a[[1]]
 maxsteps <- round(a[[2]], digits = 0)
 ```
 
-The maximum number of steps are `r maxsteps` and the corresponding interval is `r maxint`. 
+The maximum number of steps are 206 and the corresponding interval is 835. 
 This means that the maximum number of steps, on average, have been taken in the 
 five minute interval between 08:30 and 08:35.
 
@@ -192,19 +225,39 @@ five minute interval between 08:30 and 08:35.
 There are a number of days which contain missing values. First, every variable
 will be examined for missing values (NAs).
 
-```{r NA Check}
+
+```r
 # Check whether each of the variables contain any missing values and calculate
 # the number
 sum(is.na(data$steps) == TRUE)
+```
+
+```
+## [1] 2304
+```
+
+```r
 sum(is.na(data$date) == TRUE)
+```
+
+```
+## [1] 0
+```
+
+```r
 sum(is.na(data$interval) == TRUE)
+```
+
+```
+## [1] 0
 ```
 
 This analysis shows that only the steps variable contains missing values. The
 number of NAs is 2304. To fill in these missing values, the average number of 
 steps for the corresponding interval (as computed above) will be used.
 
-```{r Imputing Missing Values}
+
+```r
 ## 2. Devise a strategy for filling in all of the missing values in the dataset
 # Create a new dataset from the old one that can be used to fill in the 
 # missing values
@@ -228,12 +281,12 @@ for(n in 1:nrow(datanew)) {
                 datanew[n,1] <- as[,2]
         }
 }
-
 ```
 
 A histogram of the new (and complete) dataset will be created next.
 
-```{r Plot Total Number of Steps per Day - New Dataset}
+
+```r
 # Group the data by date
 grdatanew <- group_by(datanew, date)
 
@@ -260,15 +313,27 @@ p3 <- p3 + ggtitle("Total Number of Steps Taken per Day")
 print(p3)
 ```
 
+![](PA1_template_files/figure-html/Plot Total Number of Steps per Day - New Dataset-1.png) 
+
 In addition, the mean and median number of steps per day will be calculated.
-```{r Mean steps per day New}
+
+```r
 # Calculate the mean total steps per day
 round(mean(totalstepsnew$Steps), digits = 2)
 ```
 
-```{r Median steps per day New}
+```
+## [1] 10766.19
+```
+
+
+```r
 # Calculate the median total steps per day
 median(totalstepsnew$Steps)
+```
+
+```
+## [1] 10766.19
 ```
 
 The mean number of steps per day in the dataset with missing values is 10766.18 
@@ -280,11 +345,18 @@ stayed the same, but that the median has changed.
 To examine whether there are differences in activity patterns between weekdays 
 and weekends, the dates first have to be classified as beloning to one of the two.
 
-```{r Create a variable that denotes the difference between Week and Weekend}
+
+```r
 # Because the system language of my Mac is Dutch, I changed it to English
 # so I the weekdays aren't returned in Dutch
 Sys.setlocale(category = "LC_ALL", locale = "en_US")
+```
 
+```
+## [1] "en_US/en_US/en_US/C/en_US/nl_NL.UTF-8"
+```
+
+```r
 # Create a new variable called "Weekdays" displaying the day of the week and
 # add it to the existing dataframe
 datanew <- mutate(datanew, weekdays = weekdays(datanew$date))
@@ -307,13 +379,13 @@ for(i in 1:nrow(datanew)) {
 
 # Delete the weekday column
 datanew$weekdays <- NULL
-
 ```
 
 Next, the average number of steps per interval, per weekend or weekday will be 
 calculated.
 
-```{r Compute the Average Daily Activity Pattern per Week/Weekend}
+
+```r
 # Group the data by interval and Weekend
 grdataweek <- group_by(datanew, interval, weekend)
 
@@ -357,13 +429,13 @@ for(n in 1:nrow(averagestepsweek)) {
 # suppressed. We are not interested in the date, but in the time intervals 
 # accross a number of days.
 averagestepsweek$Time <- strptime(intervaltime[,1], "%H%M")
-
 ```
 
 Finally, a panel plot will be created, showing the average number of steps taken
 per interval, per weekend and per weekday.
 
-```{r Plot the Average Daily Activity Pattern per Weekend/Weekday}
+
+```r
 ## 1. Make a Time Series Plot of the Intervals (x-axis) and average steps (y-axis)
 # Change columnnames
 colnames(averagestepsweek) <- c("Interval", "Weekend", "Steps", "Time")
@@ -391,4 +463,6 @@ p4 <- p4 + scale_x_datetime(labels = date_format("%H%M"), breaks = date_breaks("
 # Print the plot
 print(p4)
 ```
+
+![](PA1_template_files/figure-html/Plot the Average Daily Activity Pattern per Weekend/Weekday-1.png) 
 
